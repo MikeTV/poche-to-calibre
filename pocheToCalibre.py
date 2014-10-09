@@ -6,6 +6,7 @@ from calibre.web.feeds.recipes import BasicNewsRecipe
 class Poche(BasicNewsRecipe):
 
     app_url = 'http://app.inthepoche.com'  # self-hosted or managed poche
+    article_sort = 'id' # id = date descending, ia = date ascending, td = title descending, ta = title ascending
 
     title = 'Poche'
     __author__ = 'Xavier Detant, Dmitry Sandalov'
@@ -36,7 +37,7 @@ class Poche(BasicNewsRecipe):
         pageParser = PageParser(pageCounter,base_url,self)
 
         while not pageCounter.is_max_reached():
-            page_url = base_url + "?view=home&sort=id&p=" + str(pageCounter.current_page_number())
+            page_url = base_url + "?view=home&sort=" + self.article_sort + "&p=" + str(pageCounter.current_page_number())
             soup = self.index_to_soup(page_url)
             pageParser.parse(soup)
             pageCounter.page_treated()
@@ -76,6 +77,7 @@ class PageCounter():
 
 class PageParser():
 
+    mark_as_read = True # Whether downloaded articles should be marked as read (moved to Archive)
     contents_key = 'domain'  # [domain|read-time]
     articles = {}
     ans = []
@@ -108,6 +110,11 @@ class PageParser():
             summary = div.find('p')
             if summary:
                 description = BasicNewsRecipe.tag_to_string(summary, use_alt=False)
+            if self.mark_as_read:    
+                read_anchor = div.find('a', attrs={'class': ['tool archive-off']})
+                if read_anchor:
+                    read_url = self.base_url + read_anchor['href']
+                    self.browser.index_to_soup(read_url)
             return dict(title=title, url=url, date=pubdate,description=description, content='') 
 
     def add_article(self,key,article):
