@@ -1,7 +1,7 @@
 import re
 from calibre import strftime
 from calibre.web.feeds.recipes import BasicNewsRecipe
-
+from urlparse import urlparse
 
 class Poche(BasicNewsRecipe):
 
@@ -137,7 +137,8 @@ class PageParser():
         if self.contents_key == 'read-time':
             key_tag = div.find('a', attrs={'class': ['reading-time']})
         else:
-            key_tag = div.find('a').contents[0]
+            url = 'http://' + BasicNewsRecipe.tag_to_string(div.find('a', attrs={'class': ['tool link']}))
+            key_tag = '{uri.netloc}'.format(uri=urlparse(url))
 
         return BasicNewsRecipe.tag_to_string(key_tag)
 
