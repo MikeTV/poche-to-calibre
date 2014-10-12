@@ -137,9 +137,7 @@ class PageParser():
         if self.contents_key == 'read-time':
             key_tag = div.find('a', attrs={'class': ['reading-time']})
         else:
-            url = 'http://' + BasicNewsRecipe.tag_to_string(div.find('a', attrs={'class': ['tool link']}))
-            soup = self.browser.index_to_soup(url)
-            key_tag = soup.find('title')
+            key_tag = div.find('a').contents[0]
 
         return BasicNewsRecipe.tag_to_string(key_tag)
 
