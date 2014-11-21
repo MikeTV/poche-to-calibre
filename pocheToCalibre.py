@@ -78,7 +78,7 @@ class PageCounter():
 class PageParser():
 
     mark_as_read = True # Whether downloaded articles should be marked as read (moved to Archive)
-    contents_key = 'domain'  # [domain|read-time]
+    contents_key = 'title-and-read-time'  # [domain|read-time|title-and-read-time]
     articles = {}
     ans = []
     pageCounter = None
@@ -136,6 +136,9 @@ class PageParser():
     
         if self.contents_key == 'read-time':
             key_tag = div.find('a', attrs={'class': ['reading-time']})
+        elif self.contents_key == 'title-and-read-time':
+			reading_time = ' (' + str(div.find('a', attrs={'class': ['reading-time']}).contents[0]).replace('<span>', '').replace('</span>', '') + ')'
+			key_tag = div.find('a').contents[0].rstrip('\n') + reading_time
         else:
             url = 'http://' + BasicNewsRecipe.tag_to_string(div.find('a', attrs={'class': ['tool link']}))
             key_tag = '{uri.netloc}'.format(uri=urlparse(url))
